@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Load vs Authentic Assessment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 p-6 font-sans">
+    <div class="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-6 border border-slate-100">
+        <header class="mb-6 text-center border-b border-slate-100 pb-4">
+            <h1 class="text-2xl font-bold text-slate-900">The Instructional Design Balance</h1>
+            <p class="text-slate-500 text-sm mt-1">Cognitive Load Theory vs. Authentic Assessment</p>
+        </header>
+
+        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Simulation Fidelity Scale</span>
+                <span id="fidelity-label" class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">Level 2: Structured Scenario</span>
+            </div>
+            <input type="range" id="fidelitySlider" min="1" max="4" value="2" class="w-full h-2 bg-slate-200 rounded-lg accent-indigo-600 my-4" oninput="handleSliderChange(this.value)">
+            <div class="flex justify-between text-xs text-slate-400 font-medium px-1">
+                <span>1. Decontextualized</span><span>2. Structured</span><span>3. Complex Messy</span><span>4. Hyper-Realistic</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 flex items-center justify-center min-h-[260px]">
+                <div class="w-full h-[200px]"><canvas id="balanceChart"></canvas></div>
+            </div>
+            <div class="space-y-4">
+                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+                    <h3 class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1">Authenticity Impact</h3>
+                    <p id="authenticity-desc" class="text-sm text-emerald-700 leading-relaxed">Moderate contextual learning. Students apply knowledge to a structured dilemma with clean boundaries.</p>
+                </div>
+                <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl">
+                    <h3 class="text-xs font-bold text-rose-800 uppercase tracking-wider mb-1">Cognitive Load Impact</h3>
+                    <p id="load-desc" class="text-sm text-rose-700 leading-relaxed">Intrinsic load is present, but extraneous load is minimized, freeing working memory.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 p-4 bg-slate-900 text-slate-100 rounded-xl">
+            <h3 class="text-xs font-bold tracking-widest text-indigo-400 uppercase mb-1">Instructional Design Verdict</h3>
+            <p id="verdict-text" class="text-sm font-light leading-relaxed"><strong>Sweet Spot for Initial Learning:</strong> Ideal for building mental models with high practical relevance and low cognitive strain.</p>
+        </div>
+    </div>
+
+    <script>
+        const matrixData = {
+            1: { label: "Level 1: Decontextualized (Basic Quiz / Essay)", auth: 15, load: 20, authDesc: "Low authenticity. Stripped of real-world messiness.", loadDesc: "Extraneous load is zero, but hinders deep schema integration.", verdict: "<strong>Ineffective for Application:</strong> Leaves students unable to apply concepts in real scenarios." },
+            2: { label: "Level 2: Structured Scenario (Controlled Case Study)", auth: 55, load: 45, authDesc: "Moderate contextual learning. Students apply knowledge to a clear dilemma.", loadDesc: "Intrinsic load is present, but extraneous load is managed.", verdict: "<strong>Sweet Spot for Initial Learning:</strong> Ideal for building strong foundational schemas." },
+            3: { label: "Level 3: Complex Messy Scenario (True SBL)", auth: 85, load: 75, authDesc: "High authenticity. Replicates exact field obstacles.", loadDesc: "Extraneous load spikes significantly, exhausting novice learners.", verdict: "<strong>Advanced Training Crucible:</strong> Excellent for expert students, but requires heavy scaffolding." },
+            4: { label: "Level 4: Hyper-Realistic (Immersive / Live Simulation)", auth: 100, load: 98, authDesc: "Absolute fidelity. Unpredictable, chaotic, and fully authentic.", loadDesc: "Extreme cognitive overload risk. Learning efficiency collapses.", verdict: "<strong>High-Risk Zone:</strong> Authentic assessment maxes out, but learning collapses for non-experts." }
+        };
+
+        const ctx = document.getElementById('balanceChart').getContext('2d');
+        const balanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Authenticity Level', 'Cognitive Load'],
+                datasets: [{
+                    data: [55, 45],
+                    backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(244, 63, 94, 0.85)'],
+                    borderRadius: 8, barThickness: 32
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                scales: { x: { suggestedMin: 0, suggestedMax: 100, grid: { display: false }, ticks: { display: false } }, y: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 12 }, color: '#1e293b' } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        function handleSliderChange(val) {
+            const data = matrixData[val];
+            document.getElementById('fidelity-label').innerText = data.label;
+            balanceChart.data.datasets[0].data = [data.auth, data.load];
+            balanceChart.update();
+            document.getElementById('authenticity-desc').innerText = data.authDesc;
+            document.getElementById('load-desc').innerText = data.loadDesc;
+            document.getElementById('verdict-text').innerHTML = data.verdict;
+        }
+    </script>
+</body>
+</html>
