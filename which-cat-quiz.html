@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<!-- 
+  Original work by Dr. Teague, 2026.
+  Created for graduate instructional design coursework.
+  Not authorized for resale, redistribution, or use in third-party 
+  professional/academic materials without permission.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Which CAT Fits This Goal?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 p-6 font-sans">
+    <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-6 border border-slate-100">
+        <header class="mb-6 text-center border-b border-slate-100 pb-4">
+            <h1 class="text-2xl font-bold text-slate-900">Which CAT Fits This Goal?</h1>
+            <p class="text-slate-500 text-sm mt-1">Match the learning goal to the right Classroom Assessment Technique</p>
+        </header>
+
+        <div class="flex justify-between items-center mb-4">
+            <span id="progress-label" class="text-xs font-bold uppercase tracking-wider text-slate-400">Goal 1 of 6</span>
+            <span id="score-label" class="text-xs font-bold uppercase tracking-wider text-indigo-500">Score: 0</span>
+        </div>
+
+        <div id="goal-box" class="bg-slate-50 p-5 rounded-xl border border-slate-200 mb-5 min-h-[90px] flex items-center">
+            <p id="goal-text" class="text-slate-800 text-base leading-relaxed"></p>
+        </div>
+
+        <div id="options" class="grid grid-cols-1 gap-3 mb-5">
+            <button onclick="selectCAT('naming')" class="cat-btn text-left px-4 py-3 rounded-xl border-2 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition font-medium">Naming CAT</button>
+            <button onclick="selectCAT('kwhfl')" class="cat-btn text-left px-4 py-3 rounded-xl border-2 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition font-medium">KWHFL Loop-Back CAT</button>
+            <button onclick="selectCAT('pni')" class="cat-btn text-left px-4 py-3 rounded-xl border-2 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition font-medium">PNI CAT</button>
+        </div>
+
+        <div id="feedback-box" class="hidden p-4 rounded-xl mb-5 border">
+            <p id="feedback-verdict" class="font-bold text-sm mb-1"></p>
+            <p id="feedback-text" class="text-sm leading-relaxed"></p>
+        </div>
+
+        <div class="flex justify-end">
+            <button id="next-btn" onclick="nextGoal()" class="hidden px-5 py-2 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition">Next Goal &rarr;</button>
+            <button id="restart-btn" onclick="restartQuiz()" class="hidden px-5 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition">Start Over</button>
+        </div>
+        <footer class="mt-4 text-center text-xs text-slate-400 border-t border-slate-100 pt-3">
+            &copy; 2026 Dr. Teague &mdash; Original interactive design. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        const goals = [
+            {
+                text: "Students are wrapping up a unit and revisiting their very first response to a prompt, now updating it with what they've since learned.",
+                answer: "kwhfl",
+                explanations: {
+                    naming: "Not quite. Naming CAT is about condensing a concept into a precise label, not tracking change over time.",
+                    kwhfl: "Exactly right! KWHFL Loop-Back is built for this \u2014 it circles back to an earlier response so students can see their own growth.",
+                    pni: "Close in spirit, but PNI is more about evaluating something (a reading, activity, peer work), not revisiting your own prior answer."
+                }
+            },
+            {
+                text: "You want students to distill their emerging personal teaching philosophy into a short, memorable phrase they can return to all term.",
+                answer: "naming",
+                explanations: {
+                    naming: "Correct! Naming CAT is designed exactly for this \u2014 forcing a concept into a tight, memorable label sharpens understanding.",
+                    kwhfl: "Not the best fit \u2014 KWHFL tracks knowledge over time rather than compressing an idea into a label.",
+                    pni: "Not quite \u2014 PNI is an evaluative tool, not a labeling or naming exercise."
+                }
+            },
+            {
+                text: "After a peer-review activity, you want students to note what worked, what needs revision, and what sparked new thinking \u2014 without it feeling like harsh criticism.",
+                answer: "pni",
+                explanations: {
+                    naming: "Not quite \u2014 this goal is about balanced evaluation, not condensing an idea into a label.",
+                    kwhfl: "Not the best fit \u2014 KWHFL is about tracking knowledge growth, not evaluating a specific piece of work.",
+                    pni: "Right! PNI CAT (Positive / Needs-work / Interesting) is built for exactly this kind of low-stakes, constructive evaluation."
+                }
+            },
+            {
+                text: "You're introducing a complex new framework and want to capture what students already know, what they want to find out, and eventually confirm what they actually learned.",
+                answer: "kwhfl",
+                explanations: {
+                    naming: "Not quite \u2014 this calls for tracking knowledge across a process, not naming a single concept.",
+                    kwhfl: "Yes! This is the classic KWHFL use case \u2014 mapping Know, Want, How, Find out, and Learned across a learning arc.",
+                    pni: "Not the best fit \u2014 PNI evaluates something specific rather than tracking a knowledge journey."
+                }
+            },
+            {
+                text: "You want students to react to a challenging course reading, flagging strong points, weak points, and anything that raised new questions for them.",
+                answer: "pni",
+                explanations: {
+                    naming: "Not quite \u2014 this is an evaluative response to a text, not a naming exercise.",
+                    kwhfl: "Not the best fit \u2014 there's no revisit-and-update structure here, just a direct evaluative response.",
+                    pni: "Correct! Reacting to a reading with strengths, weaknesses, and open questions is a textbook PNI use case."
+                }
+            },
+            {
+                text: "Students have just finished a group project and you want a quick way for each of them to crystallize the single biggest takeaway into one sharable term or phrase.",
+                answer: "naming",
+                explanations: {
+                    naming: "Right! Compressing a takeaway into one shareable term or phrase is exactly what Naming CAT is for.",
+                    kwhfl: "Not quite \u2014 there's no revisiting of a prior answer here, just a single point-in-time distillation.",
+                    pni: "Not the best fit \u2014 this asks for a single takeaway, not a balanced strengths/weaknesses/interest evaluation."
+                }
+            }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadGoal() {
+            answered = false;
+            const g = goals[currentIndex];
+            document.getElementById('goal-text').innerText = g.text;
+            document.getElementById('progress-label').innerText = `Goal ${currentIndex + 1} of ${goals.length}`;
+            document.getElementById('score-label').innerText = `Score: ${score}`;
+            document.getElementById('feedback-box').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('restart-btn').classList.add('hidden');
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('border-emerald-400', 'bg-emerald-50', 'border-rose-400', 'bg-rose-50', 'opacity-60');
+                btn.classList.add('border-slate-200');
+            });
+        }
+
+        function selectCAT(choice) {
+            if (answered) return;
+            answered = true;
+            const g = goals[currentIndex];
+            const correct = choice === g.answer;
+            if (correct) score++;
+
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.disabled = true);
+            const chosenBtn = document.querySelector(`[onclick="selectCAT('${choice}')"]`);
+            const correctBtn = document.querySelector(`[onclick="selectCAT('${g.answer}')"]`);
+
+            if (correct) {
+                chosenBtn.classList.remove('border-slate-200');
+                chosenBtn.classList.add('border-emerald-400', 'bg-emerald-50');
+            } else {
+                chosenBtn.classList.remove('border-slate-200');
+                chosenBtn.classList.add('border-rose-400', 'bg-rose-50');
+                correctBtn.classList.remove('border-slate-200');
+                correctBtn.classList.add('border-emerald-400', 'bg-emerald-50');
+            }
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn !== chosenBtn && btn !== correctBtn) btn.classList.add('opacity-60');
+            });
+
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-rose-50', 'border-rose-200');
+            feedbackBox.classList.add(correct ? 'bg-emerald-50' : 'bg-rose-50', correct ? 'border-emerald-200' : 'border-rose-200');
+            document.getElementById('feedback-verdict').innerText = correct ? "Correct!" : "Not quite \u2014 here's why:";
+            document.getElementById('feedback-verdict').className = `font-bold text-sm mb-1 ${correct ? 'text-emerald-800' : 'text-rose-800'}`;
+            document.getElementById('feedback-text').innerText = g.explanations[choice];
+            document.getElementById('score-label').innerText = `Score: ${score}`;
+
+            if (currentIndex < goals.length - 1) {
+                document.getElementById('next-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('restart-btn').classList.remove('hidden');
+            }
+        }
+
+        function nextGoal() {
+            currentIndex++;
+            loadGoal();
+        }
+
+        function restartQuiz() {
+            currentIndex = 0;
+            score = 0;
+            loadGoal();
+        }
+
+        loadGoal();
+    </script>
+</body>
+</html>

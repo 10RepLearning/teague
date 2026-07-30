@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!-- 
+  Original work by Dr. Teague, 2026.
+  Created for graduate instructional design coursework.
+  Not authorized for resale, redistribution, or use in third-party 
+  professional/academic materials without permission.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persona Fidelity Slider</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 p-6 font-sans">
+    <div class="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-6 border border-slate-100">
+        <header class="mb-6 text-center border-b border-slate-100 pb-4">
+            <h1 class="text-2xl font-bold text-slate-900">Persona Fidelity Slider</h1>
+            <p class="text-slate-500 text-sm mt-1">How Persona Specificity Shapes AI Dialogue</p>
+        </header>
+
+        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Persona Specificity Scale</span>
+                <span id="fidelity-label" class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">Level 2: Role + Context</span>
+            </div>
+            <input type="range" id="fidelitySlider" min="1" max="4" value="2" class="w-full h-2 bg-slate-200 rounded-lg accent-indigo-600 my-4" oninput="handleSliderChange(this.value)">
+            <div class="flex justify-between text-xs text-slate-400 font-medium px-1">
+                <span>1. Vague Persona</span><span>2. Role + Context</span><span>3. Motivated Stakeholder</span><span>4. Over-Specified</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 flex items-center justify-center min-h-[260px]">
+                <div class="w-full h-[200px]"><canvas id="balanceChart"></canvas></div>
+            </div>
+            <div class="space-y-4">
+                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+                    <h3 class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1">Dialogic Authenticity</h3>
+                    <p id="authenticity-desc" class="text-sm text-emerald-700 leading-relaxed">Some grounding is present. Responses reflect a role and situation, but lack deeper motivation or stakes.</p>
+                </div>
+                <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl">
+                    <h3 class="text-xs font-bold text-rose-800 uppercase tracking-wider mb-1">Brittleness / Predictability Risk</h3>
+                    <p id="load-desc" class="text-sm text-rose-700 leading-relaxed">Low risk. The persona has enough structure to stay consistent without being locked into a script.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 p-4 bg-slate-900 text-slate-100 rounded-xl">
+            <h3 class="text-xs font-bold tracking-widest text-indigo-400 uppercase mb-1">Persona Design Verdict</h3>
+            <p id="verdict-text" class="text-sm font-light leading-relaxed"><strong>Workable Middle Ground:</strong> Enough context to anchor believable dialogue without over-constraining the AI's responses.</p>
+        </div>
+        <footer class="mt-4 text-center text-xs text-slate-400 border-t border-slate-100 pt-3">
+            &copy; 2026 Dr. Teague &mdash; Original interactive design. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        const matrixData = {
+            1: {
+                label: "Level 1: Vague Persona (e.g., \"a teacher\")",
+                auth: 20, load: 15,
+                authDesc: "Minimal grounding. Responses default to generic, textbook-sounding dialogue with little dimension.",
+                loadDesc: "Very low brittleness, but only because there's nothing specific enough to break.",
+                verdict: "<strong>Too Thin for PBR:</strong> Students get surface-level responses that don't require real dialogic reasoning."
+            },
+            2: {
+                label: "Level 2: Role + Context (e.g., \"a 5th grade teacher discussing report cards\")",
+                auth: 55, load: 30,
+                authDesc: "Some grounding is present. Responses reflect a role and situation, but lack deeper motivation or stakes.",
+                loadDesc: "Low risk. The persona has enough structure to stay consistent without being locked into a script.",
+                verdict: "<strong>Workable Middle Ground:</strong> Enough context to anchor believable dialogue without over-constraining the AI's responses."
+            },
+            3: {
+                label: "Level 3: Motivated Stakeholder (role + context + stakes/motivation)",
+                auth: 85, load: 55,
+                authDesc: "High authenticity. The persona has a point of view, something at stake, and a reason to respond the way it does.",
+                loadDesc: "Moderate risk. Requires students to ask sharper questions to keep the dialogue coherent and on-target.",
+                verdict: "<strong>Sweet Spot for PBR:</strong> Rich enough for genuine dialogic reasoning; still flexible enough to sustain natural conversation."
+            },
+            4: {
+                label: "Level 4: Over-Specified Persona (exhaustive biography, rigid constraints)",
+                auth: 65, load: 90,
+                authDesc: "Authenticity plateaus or even drops. Excessive detail can make responses feel scripted rather than believable.",
+                loadDesc: "High risk. Tight constraints often cause repetitive, rigid, or contradictory responses under real dialogue pressure.",
+                verdict: "<strong>Diminishing Returns:</strong> More specification does not guarantee more authentic dialogue \u2014 it can backfire into brittleness."
+            }
+        };
+
+        const ctx = document.getElementById('balanceChart').getContext('2d');
+        const balanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Dialogic Authenticity', 'Brittleness Risk'],
+                datasets: [{
+                    data: [55, 30],
+                    backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(244, 63, 94, 0.85)'],
+                    borderRadius: 8, barThickness: 32
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                scales: { x: { suggestedMin: 0, suggestedMax: 100, grid: { display: false }, ticks: { display: false } }, y: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 12 }, color: '#1e293b' } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        function handleSliderChange(val) {
+            const data = matrixData[val];
+            document.getElementById('fidelity-label').innerText = data.label;
+            balanceChart.data.datasets[0].data = [data.auth, data.load];
+            balanceChart.update();
+            document.getElementById('authenticity-desc').innerText = data.authDesc;
+            document.getElementById('load-desc').innerText = data.loadDesc;
+            document.getElementById('verdict-text').innerHTML = data.verdict;
+        }
+    </script>
+</body>
+</html>
