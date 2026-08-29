@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Persona-Based-Prompting Drafting Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #1B2A4A;
+    --ink-soft: #2F4468;
+    --paper: #EAF0F5;
+    --paper-warm: #FAF9F6;
+    --brass: #B08D57;
+    --brass-bright: #C9A66B;
+    --graphite: #3A3F44;
+    --ok: #4C7A5E;
+    --flag: #A45A3A;
+    --line: rgba(27,42,74,0.16);
+    --radius: 3px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color:var(--graphite);
+    font-family:'Source Sans 3', sans-serif;
+    line-height:1.5;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 20px 80px;}
+  header{margin-bottom:32px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--brass); margin:0 0 6px;
+  }
+  h1{
+    font-family:'Fraunces', serif; font-weight:600; font-size:34px;
+    color:var(--ink); margin:0 0 8px; letter-spacing:-0.01em;
+  }
+  .sub{color:var(--ink-soft); font-size:15.5px; max-width:56ch;}
+
+  nav.stations{
+    display:flex; gap:0; margin:28px 0 0; border-bottom:1px solid var(--line);
+  }
+  nav.stations button{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    background:none; border:none; padding:10px 4px; margin-right:26px;
+    color:var(--ink-soft); cursor:pointer; letter-spacing:0.04em;
+    border-bottom:2px solid transparent; position:relative; top:1px;
+  }
+  nav.stations button.active{color:var(--ink); border-bottom-color:var(--brass); font-weight:600;}
+  nav.stations button:disabled{opacity:0.35; cursor:not-allowed;}
+
+  .panel{display:none; padding-top:28px;}
+  .panel.active{display:block; animation:rise .28s ease;}
+  @keyframes rise{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .frame{
+    background:var(--paper-warm); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px 26px 22px; box-shadow:0 1px 0 rgba(27,42,74,0.04);
+  }
+  .frame h2{
+    font-family:'Fraunces', serif; font-size:20px; font-weight:600; color:var(--ink);
+    margin:0 0 4px;
+  }
+  .frame .prompt-copy{color:var(--ink-soft); font-size:14.5px; margin:0 0 18px; max-width:60ch;}
+
+  label{display:block; font-family:'IBM Plex Mono', monospace; font-size:11.5px;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--brass); margin-bottom:6px;}
+  textarea{
+    width:100%; min-height:110px; resize:vertical; font-family:'Source Sans 3', sans-serif;
+    font-size:15px; padding:12px 14px; border:1px solid var(--line); border-radius:var(--radius);
+    background:#fff; color:var(--graphite);
+  }
+  textarea:focus{outline:2px solid var(--brass-bright); outline-offset:1px;}
+
+  .row{display:flex; gap:14px; align-items:flex-start; margin-top:16px; flex-wrap:wrap;}
+  button.check{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:0.03em;
+    background:var(--ink); color:var(--paper-warm); border:none; padding:11px 20px;
+    border-radius:var(--radius); cursor:pointer;
+  }
+  button.check:hover{background:var(--ink-soft);}
+  button.ghost{
+    font-family:'IBM Plex Mono', monospace; font-size:13px;
+    background:none; color:var(--ink-soft); border:1px solid var(--line); padding:10px 18px;
+    border-radius:var(--radius); cursor:pointer;
+  }
+  button.ghost:hover{border-color:var(--brass);}
+
+  .readout{
+    margin-top:16px; padding:14px 16px; border-left:3px solid var(--line);
+    font-size:14.5px; background:rgba(27,42,74,0.03); border-radius:0 var(--radius) var(--radius) 0;
+    display:none;
+  }
+  .readout.show{display:block;}
+  .readout.ok{border-left-color:var(--ok);}
+  .readout.flag{border-left-color:var(--flag);}
+  .readout .verdict{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.06em;
+    text-transform:uppercase; display:block; margin-bottom:5px;}
+  .readout.ok .verdict{color:var(--ok);}
+  .readout.flag .verdict{color:var(--flag);}
+  .readout ul{margin:6px 0 0; padding-left:18px;}
+
+  /* Fidelity gauge */
+  .gauge-wrap{display:flex; align-items:center; gap:18px; margin-top:18px;}
+  .gauge-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft);
+    letter-spacing:0.04em; max-width:22ch;}
+  svg.gauge{flex-shrink:0;}
+  .gauge-score{font-family:'Fraunces', serif; font-size:22px; color:var(--ink); font-weight:600;}
+
+  .nav-footer{display:flex; justify-content:space-between; margin-top:22px;}
+
+  /* Synthesis */
+  .synthesis-block{
+    background:#fff; border:1px dashed var(--line); border-radius:var(--radius);
+    padding:18px 20px; font-size:14.5px; white-space:pre-wrap; margin-top:14px;
+    font-family:'IBM Plex Mono', monospace; color:var(--graphite); line-height:1.65;
+  }
+
+  /* Station 4 */
+  .founding-tag{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11px;
+    letter-spacing:0.08em; text-transform:uppercase; color:#fff; background:var(--brass);
+    padding:3px 9px; border-radius:2px; margin-bottom:12px;
+  }
+  table.checklist{width:100%; border-collapse:collapse; margin-top:14px;}
+  table.checklist th{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase;
+    letter-spacing:0.05em; text-align:left; color:var(--brass); border-bottom:1px solid var(--line);
+    padding:8px 10px;
+  }
+  table.checklist td{
+    padding:12px 10px; border-bottom:1px solid var(--line); font-size:14.5px; vertical-align:top;
+  }
+  table.checklist td.item-no{
+    font-family:'IBM Plex Mono', monospace; color:var(--ink-soft); width:36px;
+  }
+  .add-row{
+    margin-top:10px; padding:12px 14px; border:1px dashed var(--line); border-radius:var(--radius);
+    font-size:13.5px; color:var(--ink-soft); font-style:italic;
+  }
+  .credit-block{
+    margin-top:22px; padding:14px 16px; background:rgba(176,141,87,0.08);
+    border-radius:var(--radius); font-size:13.5px; color:var(--ink-soft);
+  }
+  .credit-block strong{color:var(--ink);}
+
+  footer{
+    margin-top:56px; padding-top:18px; border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft);
+    text-align:center;
+  }
+  @media (max-width:600px){
+    nav.stations{overflow-x:auto;}
+    .gauge-wrap{flex-direction:column; align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Dr. Teague's Drafting Bench</p>
+    <h1>Persona-Based-Prompting Drafting Bench</h1>
+    <p class="sub">Build a Persona-Based-Prompting (PBP) activity one station at a time. This interactive Drafting Bench will not write your persona or your prompt for you — it will read what you enter and will provide feedback on what it notices and why.</p>
+  </header>
+
+  <nav class="stations">
+    <button class="stn-btn active" data-panel="s1">01 · Goal</button>
+    <button class="stn-btn" data-panel="s2">02 · Persona</button>
+    <button class="stn-btn" data-panel="s3">03 · Prompt</button>
+    <button class="stn-btn" data-panel="s5">Synthesis</button>
+    <button class="stn-btn" data-panel="s4">04 · Peer Review</button>
+  </nav>
+
+  <!-- STATION 1 -->
+  <section class="panel active" id="s1">
+    <div class="frame">
+      <h2>Station 1 — Instructional Goal</h2>
+      <p class="prompt-copy">Name the concrete instructional objective and learner population this PBP activity needs to serve. Broad, unmeasurable goals make every later station harder to check.</p>
+      <label for="goalInput">Goal</label>
+      <textarea id="goalInput" placeholder="e.g., Help pre-service teachers distinguish formative from summative assessment when planning a unit for 4th-grade science learners."></textarea>
+      <div class="row">
+        <button class="check" onclick="checkGoal()">Check this station</button>
+      </div>
+      <div class="readout" id="goalReadout"></div>
+    </div>
+    <div class="nav-footer">
+      <span></span>
+      <button class="ghost" onclick="goTo('s2')">Next: Persona →</button>
+    </div>
+  </section>
+
+  <!-- STATION 2 -->
+  <section class="panel" id="s2">
+    <div class="frame">
+      <h2>Station 2 — Persona</h2>
+      <p class="prompt-copy">Draft the persona itself: who is speaking, in what voice, with what expertise or constraints. A persona that could be swapped for any other without changing the activity is decoration, not instruction.</p>
+      <label for="personaInput">Persona description</label>
+      <textarea id="personaInput" placeholder="e.g., A skeptical veteran teacher who has seen three curriculum fads come and go, speaks bluntly, and demands evidence before praising an idea."></textarea>
+      <div class="row">
+        <button class="check" onclick="checkPersona()">Check this station</button>
+      </div>
+      <div class="readout" id="personaReadout"></div>
+      <div class="gauge-wrap">
+        <svg class="gauge" width="120" height="72" viewBox="0 0 120 72">
+          <path d="M10,66 A50,50 0 0,1 110,66" fill="none" stroke="var(--line)" stroke-width="10"/>
+          <path id="gaugeArc" d="M10,66 A50,50 0 0,1 110,66" fill="none" stroke="var(--brass)" stroke-width="10" stroke-dasharray="157" stroke-dashoffset="157"/>
+          <line id="gaugeNeedle" x1="60" y1="66" x2="60" y2="24" stroke="var(--ink)" stroke-width="2.5" transform="rotate(-90 60 66)"/>
+          <circle cx="60" cy="66" r="4" fill="var(--ink)"/>
+        </svg>
+        <div>
+          <div class="gauge-score" id="gaugeScore">—</div>
+          <div class="gauge-label">Fidelity signal: a heuristic read on specificity, not a grade. Revise and re-check as many times as you like.</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="ghost" onclick="goTo('s1')">← Goal</button>
+      <button class="ghost" onclick="goTo('s3')">Next: Prompt →</button>
+    </div>
+  </section>
+
+  <!-- STATION 3 -->
+  <section class="panel" id="s3">
+    <div class="frame">
+      <h2>Station 3 — Prompt Assembly</h2>
+      <p class="prompt-copy">Combine the goal and persona into the actual prompt you would hand to an AI system — not a description of what it should do, but the working text itself.</p>
+      <label for="promptInput">Assembled prompt</label>
+      <textarea id="promptInput" placeholder="e.g., You are [persona]. A pre-service teacher will describe a lesson plan to you. Respond in character, pushing back on any assessment that isn't clearly formative or summative, and explain your reasoning in one or two sentences each time."></textarea>
+      <div class="row">
+        <button class="check" onclick="checkPrompt()">Check this station</button>
+      </div>
+      <div class="readout" id="promptReadout"></div>
+    </div>
+    <div class="nav-footer">
+      <button class="ghost" onclick="goTo('s2')">← Persona</button>
+      <button class="ghost" onclick="goTo('s5')">Next: Synthesis →</button>
+    </div>
+  </section>
+
+  <!-- SYNTHESIS -->
+  <section class="panel" id="s5">
+    <div class="frame">
+      <h2>Synthesis</h2>
+      <p class="prompt-copy">Your assembled PBP activity, drawn from Stations 1–3. Export this to a peer for the fidelity check at Station 4.</p>
+      <div class="synthesis-block" id="synthesisOut">Fill in Stations 1–3, then return here.</div>
+      <div class="row">
+        <button class="check" onclick="buildSynthesis()">Assemble</button>
+        <button class="ghost" onclick="copySynthesis()">Copy for peer exchange</button>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="ghost" onclick="goTo('s3')">← Prompt</button>
+      <button class="ghost" onclick="goTo('s4')">Next: Peer Review →</button>
+    </div>
+  </section>
+
+  <!-- STATION 4 -->
+  <section class="panel" id="s4">
+    <div class="frame">
+      <span class="founding-tag">v0 · Founding Edition</span>
+      <h2>Station 4 — Peer Fidelity Review</h2>
+      <p class="prompt-copy">A peer runs your exported prompt against an AI and works through this checklist. This edition of the checklist is static for the beta trial — a future session will invite this cohort to add and refine items, becoming its founding editors.</p>
+      <table class="checklist">
+        <tr><th>No.</th><th>Check</th></tr>
+        <tr><td class="item-no">1</td><td>Did the persona hold up under a follow-up question, or did it slip into generic AI voice partway through?</td></tr>
+        <tr><td class="item-no">2</td><td>Could this same output have come from a plain scenario-based (SBL) prompt with no persona at all? If so, what would need to change to make the persona necessary?</td></tr>
+        <tr><td class="item-no">3</td><td>Did the persona serve the author's stated goal, or was it decorative — present in tone but not shaping the substance of the response?</td></tr>
+      </table>
+      <div class="add-row">+ Space reserved for items 4–6, to be added by this cohort in a follow-up session.</div>
+      <div class="credit-block">
+        <strong>Founding Editors:</strong> this checklist's first three items and its future additions will be credited to the cohort that authored them, dated by session — the same attribution convention used throughout Dr. Teague's Drafting Bench tools.
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="ghost" onclick="goTo('s5')">← Synthesis</button>
+      <span></span>
+    </div>
+  </section>
+
+  <footer>
+    Content from Dr. Teague, expert and responsive coding by Anthropic Claude-AI. Thank you, Claude!
+  </footer>
+</div>
+
+<!-- Content from Dr. Teague, expert and responsive coding by Anthropic Claude-AI. -->
+<script>
+function goTo(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.stn-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector(`.stn-btn[data-panel="${id}"]`).classList.add('active');
+}
+document.querySelectorAll('.stn-btn').forEach(b=>{
+  b.addEventListener('click', ()=>goTo(b.dataset.panel));
+});
+
+function wordCount(t){ return t.trim().split(/\s+/).filter(Boolean).length; }
+
+function setReadout(el, ok, verdict, lines){
+  el.className = 'readout show ' + (ok ? 'ok' : 'flag');
+  let html = `<span class="verdict">${verdict}</span>`;
+  if(lines && lines.length){
+    html += '<ul>' + lines.map(l=>`<li>${l}</li>`).join('') + '</ul>';
+  }
+  el.innerHTML = html;
+}
+
+function checkGoal(){
+  const t = document.getElementById('goalInput').value;
+  const el = document.getElementById('goalReadout');
+  const wc = wordCount(t);
+  const flags = [];
+  if(wc < 12) flags.push("Under 12 words — likely too broad to anchor a persona check later.");
+  if(!/\b(help|enable|teach|show|guide|support|build|develop|distinguish|identify|analyze|apply|design)\b/i.test(t)) flags.push("No clear action verb spotted — what should the learner be able to do?");
+  if(!/\b(grade|learner|student|teacher|cohort|K-?\d|pre-?service|graduate|adult)\b/i.test(t)) flags.push("No learner population named — who is this activity for?");
+  if(flags.length === 0){
+    setReadout(el, true, "Reads specific enough to proceed", ["Names an action and a population — carry this into Station 2."]);
+  } else {
+    setReadout(el, false, "Still reads broadly", flags);
+  }
+}
+
+function personaScore(t){
+  let score = 15;
+  const generic = /(helpful assistant|ai assistant|here to help|as an ai|i am an ai)/i;
+  const tone = /(skeptical|blunt|gentle|stern|wry|folksy|formal|enthusiastic|impatient|meticulous|dry|warm|gruff|curious|cynical|earnest)/i;
+  const role = /(veteran|expert|professor|engineer|nurse|editor|coach|founder|apprentice|historian|critic|mentor|elder|novice)/i;
+  if(t.length > 60) score += 20;
+  if(t.length > 200) score += 20;
+  if(!generic.test(t)) score += 15;
+  if(tone.test(t)) score += 15;
+  if(role.test(t)) score += 15;
+  return Math.min(score, 100);
+}
+
+function checkPersona(){
+  const t = document.getElementById('personaInput').value;
+  const el = document.getElementById('personaReadout');
+  const flags = [];
+  if(t.length < 60) flags.push("Short and thin — a persona this brief is hard to distinguish from no persona at all.");
+  if(/(helpful assistant|ai assistant|here to help)/i.test(t)) flags.push("Contains generic assistant language — this is the phrasing a persona exists to replace.");
+  if(!/(skeptical|blunt|gentle|stern|wry|folksy|formal|enthusiastic|impatient|meticulous|dry|warm|gruff|curious|cynical|earnest)/i.test(t)) flags.push("No voice or tone descriptor spotted — how does this persona sound, specifically?");
+  if(flags.length === 0){
+    setReadout(el, true, "Reads as a functional persona", ["Has voice and specificity — carry it into the prompt."]);
+  } else {
+    setReadout(el, false, "May read as decorative", flags);
+  }
+  const score = personaScore(t);
+  document.getElementById('gaugeScore').textContent = score + '%';
+  const offset = 157 - (157 * score/100);
+  document.getElementById('gaugeArc').setAttribute('stroke-dashoffset', offset);
+  const angle = -90 + (180 * score/100);
+  document.getElementById('gaugeNeedle').setAttribute('transform', `rotate(${angle} 60 66)`);
+}
+
+function checkPrompt(){
+  const t = document.getElementById('promptInput').value;
+  const goal = document.getElementById('goalInput').value.toLowerCase();
+  const el = document.getElementById('promptReadout');
+  const flags = [];
+  if(!/you are/i.test(t)) flags.push("No explicit persona framing spotted (e.g., \"You are...\") — the AI needs to be told who it is being.");
+  if(!/(respond|answer|explain|push back|ask|react|reply)/i.test(t)) flags.push("No instruction for how the persona should behave in response — voice alone is not a task.");
+  const goalWords = goal.split(/\s+/).filter(w=>w.length>5).slice(0,3);
+  const overlap = goalWords.some(w=>t.toLowerCase().includes(w));
+  if(goalWords.length && !overlap) flags.push("None of the goal's key terms appear in the prompt — check that it still points at Station 1's objective.");
+  if(flags.length === 0){
+    setReadout(el, true, "Assembled prompt looks anchored", ["Carries persona framing, a behavior instruction, and a link back to the goal."]);
+  } else {
+    setReadout(el, false, "Some anchors may be missing", flags);
+  }
+}
+
+function buildSynthesis(){
+  const goal = document.getElementById('goalInput').value.trim();
+  const persona = document.getElementById('personaInput').value.trim();
+  const prompt = document.getElementById('promptInput').value.trim();
+  const out = document.getElementById('synthesisOut');
+  if(!goal && !persona && !prompt){
+    out.textContent = "Fill in Stations 1–3, then return here.";
+    return;
+  }
+  out.textContent =
+`GOAL
+${goal || '(not yet entered)'}
+
+PERSONA
+${persona || '(not yet entered)'}
+
+PROMPT
+${prompt || '(not yet entered)'}`;
+}
+
+function copySynthesis(){
+  const text = document.getElementById('synthesisOut').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btns = document.querySelectorAll('#s5 .ghost');
+    const btn = btns[0];
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(()=>{ btn.textContent = original; }, 1600);
+  });
+}
+</script>
+</body>
+</html>
