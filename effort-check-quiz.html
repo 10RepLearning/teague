@@ -1,0 +1,342 @@
+<!--
+  The Effort Check — self-assessment diagnostic
+  Pedagogical design, framing, and content authored by Dr. Teague.
+  Code generated with Claude (Anthropic) per her specification.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Effort Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ece7dc;
+    --paper-edge:#ddd6c6;
+    --ink:#26241f;
+    --ink-soft:#5c5748;
+    --brick:#a4402e;
+    --brick-tint:#f0d9cf;
+    --blue:#2b5570;
+    --blue-tint:#d7e2e6;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:48px 20px 80px;
+    line-height:1.5;
+  }
+  .sheet{
+    width:100%;
+    max-width:600px;
+  }
+  header{
+    margin-bottom:34px;
+    border-bottom:1px solid var(--paper-edge);
+    padding-bottom:22px;
+  }
+  h1{
+    font-family:'Newsreader', serif;
+    font-weight:600;
+    font-size:2.1rem;
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:0.98rem;
+    max-width:46ch;
+  }
+  .q{
+    margin-bottom:30px;
+    padding-bottom:26px;
+    border-bottom:1px dashed var(--paper-edge);
+  }
+  .q:last-of-type{border-bottom:none;}
+  .q-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .glyph{
+    font-size:1.3rem;
+    line-height:1;
+  }
+  .q-num{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:0.95rem;
+  }
+  .q-text{
+    font-size:1.05rem;
+    margin:0 0 14px;
+  }
+  .choices{
+    display:grid;
+    gap:10px;
+  }
+  .choice{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:13px 16px;
+    border-radius:var(--radius);
+    border:1px solid var(--paper-edge);
+    background:#f5f2e9;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice:hover{border-color:var(--ink-soft);}
+  .choice input{
+    margin-top:3px;
+    accent-color:var(--ink);
+    flex-shrink:0;
+  }
+  .choice .dot{
+    width:11px;height:11px;border-radius:50%;
+    margin-top:5px;
+    flex-shrink:0;
+  }
+  .choice.red .dot{background:var(--brick);}
+  .choice.blue .dot{background:var(--blue);}
+  .choice.red.selected{background:var(--brick-tint); border-color:var(--brick);}
+  .choice.blue.selected{background:var(--blue-tint); border-color:var(--blue);}
+  .choice-text{font-size:0.95rem;}
+
+  .reveal-row{
+    margin-top:8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  button.reveal{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:500;
+    font-size:0.98rem;
+    padding:13px 30px;
+    border-radius:999px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    cursor:pointer;
+    transition:transform .12s ease, opacity .15s ease;
+  }
+  button.reveal:disabled{
+    opacity:0.35;
+    cursor:not-allowed;
+  }
+  button.reveal:not(:disabled):hover{transform:translateY(-1px);}
+  .hint{
+    font-size:0.82rem;
+    color:var(--ink-soft);
+  }
+
+  #result{
+    display:none;
+    margin-top:34px;
+    border-radius:14px;
+    padding:28px 26px;
+    border:1px solid var(--paper-edge);
+    opacity:0;
+    transform:translateY(6px) scale(0.98);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  #result.show{
+    display:block;
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  #result.red-lean{background:var(--brick-tint); border-color:var(--brick);}
+  #result.blue-lean{background:var(--blue-tint); border-color:var(--blue);}
+  #result.tie{background:#eee6da; border-color:var(--ink-soft);}
+
+  .tally{
+    display:flex;
+    gap:6px;
+    margin-bottom:16px;
+  }
+  .tally span{
+    width:22px;height:22px;border-radius:5px;
+  }
+  .tally span.r{background:var(--brick);}
+  .tally span.b{background:var(--blue);}
+
+  #result h2{
+    font-family:'Newsreader', serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:1.5rem;
+    margin:0 0 10px;
+  }
+  #result p{
+    margin:0;
+    font-size:0.98rem;
+    max-width:52ch;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #result{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <h1>The Effort Check</h1>
+    <p>A four-question diagnostic. Answer honestly — this isn't about right or wrong, it's about naming your current educational practice ~Dr. Teague.</p>
+  </header>
+
+  <div class="q" data-q="1">
+    <div class="q-head"><span class="glyph">🔧</span><span class="q-num">1</span></div>
+    <p class="q-text">When a digital tool doesn't work perfectly in the first 2 minutes, my first instinct is to:</p>
+    <div class="choices">
+      <label class="choice red" data-val="red">
+        <span class="dot"></span>
+        <span class="choice-text">Assume the tool is junk and plan an analog alternative.</span>
+        <input type="radio" name="q1" value="red" hidden>
+      </label>
+      <label class="choice blue" data-val="blue">
+        <span class="dot"></span>
+        <span class="choice-text">Look for a workaround, refresh, or ask a student for help.</span>
+        <input type="radio" name="q1" value="blue" hidden>
+      </label>
+    </div>
+  </div>
+
+  <div class="q" data-q="2">
+    <div class="q-head"><span class="glyph">🧭</span><span class="q-num">2</span></div>
+    <p class="q-text">When planning a lesson that integrates technology, I spend the most time worrying about:</p>
+    <div class="choices">
+      <label class="choice red" data-val="red">
+        <span class="dot"></span>
+        <span class="choice-text">Logistics — logins, Wi-Fi dropping, students landing on the wrong site.</span>
+        <input type="radio" name="q2" value="red" hidden>
+      </label>
+      <label class="choice blue" data-val="blue">
+        <span class="dot"></span>
+        <span class="choice-text">Pedagogy — how the tool actually deepens content mastery.</span>
+        <input type="radio" name="q2" value="blue" hidden>
+      </label>
+    </div>
+  </div>
+
+  <div class="q" data-q="3">
+    <div class="q-head"><span class="glyph">📱</span><span class="q-num">3</span></div>
+    <p class="q-text">My past personal experiences with social/digital media make me feel:</p>
+    <div class="choices">
+      <label class="choice red" data-val="red">
+        <span class="dot"></span>
+        <span class="choice-text">Overwhelmed and protective of classroom boundaries; school should be a break from screens.</span>
+        <input type="radio" name="q3" value="red" hidden>
+      </label>
+      <label class="choice blue" data-val="blue">
+        <span class="dot"></span>
+        <span class="choice-text">Inspired by how communication flows; I want to harness that engagement for learning.</span>
+        <input type="radio" name="q3" value="blue" hidden>
+      </label>
+    </div>
+  </div>
+
+  <div class="q" data-q="4">
+    <div class="q-head"><span class="glyph">✏️</span><span class="q-num">4</span></div>
+    <p class="q-text">If I'm being completely honest, sticking to traditional paper/pencil methods feels:</p>
+    <div class="choices">
+      <label class="choice red" data-val="red">
+        <span class="dot"></span>
+        <span class="choice-text">Safer and significantly less exhausting to prep and manage.</span>
+        <input type="radio" name="q4" value="red" hidden>
+      </label>
+      <label class="choice blue" data-val="blue">
+        <span class="dot"></span>
+        <span class="choice-text">Necessary at times, but occasionally limiting for student collaboration.</span>
+        <input type="radio" name="q4" value="blue" hidden>
+      </label>
+    </div>
+  </div>
+
+  <div class="reveal-row">
+    <button class="reveal" id="revealBtn" disabled>See My Result</button>
+    <span class="hint" id="hint">Answer all four to unlock your result.</span>
+  </div>
+
+  <div id="result"></div>
+
+  <footer style="margin-top:40px; text-align:center; font-size:0.78rem; color:var(--ink-soft);">
+    Designed by Dr. Teague · built with Claude
+  </footer>
+
+</div>
+
+<script>
+  const questions = ['q1','q2','q3','q4'];
+  const btn = document.getElementById('revealBtn');
+  const hint = document.getElementById('hint');
+  const resultEl = document.getElementById('result');
+
+  document.querySelectorAll('.choice').forEach(choice => {
+    choice.addEventListener('click', () => {
+      const group = choice.querySelector('input').name;
+      document.querySelectorAll(`.choice input[name="${group}"]`).forEach(inp => {
+        inp.closest('.choice').classList.remove('selected');
+      });
+      choice.classList.add('selected');
+      choice.querySelector('input').checked = true;
+      checkComplete();
+    });
+  });
+
+  function checkComplete(){
+    const answered = questions.every(q => document.querySelector(`input[name="${q}"]:checked`));
+    btn.disabled = !answered;
+    hint.textContent = answered ? 'Ready when you are.' : 'Answer all four to unlock your result.';
+  }
+
+  btn.addEventListener('click', () => {
+    let red = 0, blue = 0;
+    questions.forEach(q => {
+      const val = document.querySelector(`input[name="${q}"]:checked`).value;
+      if (val === 'red') red++; else blue++;
+    });
+
+    let cls, title, body;
+    if (red > blue) {
+      cls = 'red-lean';
+      title = 'Effort Fatigue';
+      body = "Your barrier isn't the technology itself — it's the operational energy required to manage it. You need frictionless tools, not more features.";
+    } else if (blue > red) {
+      cls = 'blue-lean';
+      title = 'Prosumer Mindset';
+      body = "You already see the pedagogical value. What you need is a streamlined framework to execute the vision you already have.";
+    } else {
+      cls = 'tie';
+      title = 'Split Down the Middle';
+      body = "You're carrying both the operational caution and the pedagogical pull in equal measure — worth naming which one shows up first when you're tired.";
+    }
+
+    resultEl.className = cls;
+    resultEl.innerHTML = `
+      <div class="tally">
+        ${Array(red).fill('<span class="r"></span>').join('')}${Array(blue).fill('<span class="b"></span>').join('')}
+      </div>
+      <h2>${title}</h2>
+      <p>${body}</p>
+    `;
+    requestAnimationFrame(() => resultEl.classList.add('show'));
+    resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+</script>
+</body>
+</html>
