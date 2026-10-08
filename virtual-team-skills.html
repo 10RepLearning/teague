@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<!--
+  Pedagogical design and adaptation: Dr. Teague.
+  Code generated with Claude Sonnet 5.5 (Anthropic, 2026), reviewed and published by Dr. Teague.
+  Assessment content: (c) inspired by Mind Tools Assessment Framework.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Good Are Your Virtual Team Skills?</title>
+<meta name="description" content="A 15-statement self-assessment of virtual teamwork skills, with scoring and three pillars of distributed excellence.">
+<style>
+  :root {
+    --paper: #f6f8fa;
+    --card: #ffffff;
+    --ink: #17252f;
+    --muted: #51636f;
+    --line: #cfd8de;
+    --accent: #1d4f7c;
+    --accent-soft: #e3edf5;
+    --ok: #1f6b4a;
+    --p1: #1d4f7c;
+    --p2: #7a4a8c;
+    --p3: #9a5b13;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0f1a22;
+      --card: #16242e;
+      --ink: #e8eef2;
+      --muted: #9fb0bb;
+      --line: #2c3f4c;
+      --accent: #7fb3de;
+      --accent-soft: #1b3345;
+      --ok: #6fcf9f;
+      --p1: #7fb3de;
+      --p2: #c79ad8;
+      --p3: #e0a965;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    line-height: 1.6;
+    font-size: 1.05rem;
+  }
+  .wrap { max-width: 52rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+  h1, h2, h3, .ui { font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; }
+  h1 { font-size: clamp(2rem, 5vw, 2.9rem); line-height: 1.12; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  .subtitle { font-size: 1.25rem; color: var(--accent); margin: 0 0 1.5rem; font-style: italic; }
+  h2 { font-size: 1.5rem; margin: 3rem 0 .75rem; }
+  h3 { font-size: 1.15rem; margin: 0 0 .4rem; }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+
+  .key { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; padding: 0; margin: 0 0 1rem; list-style: none; font-size: .95rem; color: var(--muted); }
+  .key b { color: var(--ink); }
+
+  .progress { position: sticky; top: 0; z-index: 5; background: var(--paper); padding: .6rem 0; border-bottom: 1px solid var(--line); margin-bottom: 1rem; display: flex; align-items: center; gap: .9rem; font-size: .9rem; }
+  .bar { flex: 1; height: .5rem; background: var(--line); border-radius: 1rem; overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+
+  fieldset.q { border: 1px solid var(--line); background: var(--card); border-radius: .5rem; padding: 1rem 1.1rem 1.1rem; margin: 0 0 .9rem; }
+  fieldset.q legend { padding: 0 .35rem; font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-size: .85rem; font-weight: 700; color: var(--muted); }
+  .stmt { margin: 0 0 .8rem; max-width: none; }
+  .opts { display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem; }
+  .opts label { position: relative; }
+  .opts input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .opts span { display: block; text-align: center; padding: .5rem .2rem; border: 1px solid var(--line); border-radius: .35rem; font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-size: .9rem; font-weight: 700; color: var(--muted); transition: background .12s, color .12s, border-color .12s; }
+  .opts input:hover + span { border-color: var(--accent); }
+  .opts input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .opts input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .full { display: none; }
+  @media (min-width: 40rem) {
+    .opts span small { display: block; font-weight: 400; font-size: .72rem; margin-top: .1rem; }
+  }
+  @media (max-width: 39.99rem) { .opts span small { display: none; } }
+
+  .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0; }
+  button { font: inherit; font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-weight: 700; padding: .7rem 1.4rem; border-radius: .4rem; border: 2px solid var(--accent); cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--paper); }
+  button.secondary { background: transparent; color: var(--accent); }
+  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  #msg { color: var(--muted); font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-size: .95rem; margin: 0; align-self: center; }
+
+  #result { display: none; border: 2px solid var(--accent); background: var(--accent-soft); border-radius: .6rem; padding: 1.4rem 1.5rem; margin-top: 1rem; }
+  #result.show { display: block; }
+  #result .total { font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-size: 3rem; font-weight: 700; line-height: 1; margin: 0 0 .25rem; }
+  #result .total small { font-size: 1.1rem; font-weight: 400; color: var(--muted); }
+  #result .level { font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0 0 .5rem; color: var(--accent); }
+  .pillarscores { display: grid; gap: .6rem; margin-top: 1.2rem; }
+  .ps { display: grid; grid-template-columns: 1fr auto; gap: .2rem .8rem; align-items: center; font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-size: .95rem; }
+  .ps .track { grid-column: 1 / -1; height: .55rem; background: var(--line); border-radius: 1rem; overflow: hidden; }
+  .ps .track i { display: block; height: 100%; }
+  .ps:nth-child(1) .track i { background: var(--p1); }
+  .ps:nth-child(2) .track i { background: var(--p2); }
+  .ps:nth-child(3) .track i { background: var(--p3); }
+  .lowest { margin: 1rem 0 0; font-size: .98rem; }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); font-size: .98rem; }
+  th, td { text-align: left; vertical-align: top; padding: .75rem .9rem; border-bottom: 1px solid var(--line); }
+  th { font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; background: var(--accent-soft); font-size: .9rem; }
+  td.range { white-space: nowrap; font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-weight: 700; }
+  tr.active td { background: var(--accent-soft); box-shadow: inset 4px 0 0 var(--accent); }
+  .scroll { overflow-x: auto; }
+
+  .pillar { background: var(--card); border: 1px solid var(--line); border-left-width: 6px; border-radius: .4rem; padding: 1rem 1.2rem .4rem; margin-bottom: 1rem; }
+  .pillar.p1 { border-left-color: var(--p1); }
+  .pillar.p2 { border-left-color: var(--p2); }
+  .pillar.p3 { border-left-color: var(--p3); }
+  .pillar .qs { font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif; font-size: .9rem; color: var(--muted); margin: 0 0 .6rem; }
+
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+  @media print { .progress, .actions { display: none; } body { background: #fff; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>How Good Are Your Virtual Team Skills?</h1>
+    <p class="subtitle">Find out how to collaborate effectively across distances</p>
+    <p>Frequent virtual collaboration is an essential component of modern professional and academic workflows. When you operate effectively in a digital team environment, you minimize friction, optimize asynchronous output, and preserve trust across distributed environments. This quiz will help you evaluate and understand your virtual teamwork skills, offering target frameworks you can use to develop sustainable remote habits.</p>
+  </header>
+
+  <section aria-labelledby="qh">
+    <h2 id="qh">Self-assessment questions</h2>
+    <p>For each of the 15 statements below, select the option that best describes your actual behavior and attitude from the following spectrum. Answer honestly based on your current reality rather than ideal expectations.</p>
+    <ul class="key" aria-label="Answer key">
+      <li><b>SA</b> = Strongly Agree</li>
+      <li><b>A</b> = Agree</li>
+      <li><b>N</b> = Neither Agree Nor Disagree</li>
+      <li><b>D</b> = Disagree</li>
+      <li><b>SD</b> = Strongly Disagree</li>
+    </ul>
+
+    <div class="progress ui" aria-live="polite">
+      <span id="count">0 of 15 answered</span>
+      <div class="bar" aria-hidden="true"><span id="fill"></span></div>
+    </div>
+
+    <form id="quiz" novalidate></form>
+
+    <div class="actions">
+      <button type="button" class="primary" id="score">Score my answers</button>
+      <button type="button" class="secondary" id="reset">Start over</button>
+      <p id="msg" role="status"></p>
+    </div>
+
+    <div id="result" role="region" aria-labelledby="rtitle" tabindex="-1">
+      <h3 id="rtitle" class="ui">Your result</h3>
+      <p class="total" id="total"></p>
+      <p class="level" id="level"></p>
+      <p id="levelText"></p>
+      <div class="pillarscores" id="pillarscores"></div>
+      <p class="lowest" id="lowest"></p>
+    </div>
+  </section>
+
+  <section aria-labelledby="sh">
+    <h2 id="sh">Scoring and interpretation</h2>
+    <p>For all 15 statements, this quiz uses a standard linear scale. Score your selections as follows: Strongly Agree = 5 points, Agree = 4, Neither = 3, Disagree = 2, Strongly Disagree = 1.</p>
+    <div class="scroll">
+      <table id="bands">
+        <thead><tr><th scope="col">Score range</th><th scope="col">Skill competency evaluation</th></tr></thead>
+        <tbody>
+          <tr data-band="0"><td class="range">15 &ndash; 35</td><td><strong>Emerging Virtual Collaborator:</strong> You likely experience significant friction in digital environments. You may heavily rely on immediate, real-time responses or default to synchronous behaviors that create bottlenecks. Focus on building asynchronous habits, clarifying boundaries, and explicitly establishing project trackers.</td></tr>
+          <tr data-band="1"><td class="range">36 &ndash; 55</td><td><strong>Competent Virtual Teammate:</strong> Your virtual skills are solid, but there is noticeable room for optimization. You successfully navigate basic remote communication, but might fall into common traps like text misinterpretation, misaligned channel parameters, or poor cross-timezone documentation. Target your lower-scoring statements to improve.</td></tr>
+          <tr data-band="2"><td class="range">56 &ndash; 75</td><td><strong>Highly Effective Digital Leader:</strong> Excellent work! You demonstrate high emotional intelligence and structural rigor optimized for distributed frameworks. You actively cultivate psychological safety, maintain deliberate sync/async balance, and insulate your team against virtual fatigue. Focus on sustaining these habits and mentoring peers.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="ph">
+    <h2 id="ph">The three core pillars of distributed excellence</h2>
+    <p>This diagnostic evaluation directly aligns with the primary operational areas required to sustain effective distributed teams. Review your score distribution across these structural dimensions.</p>
+
+    <article class="pillar p1">
+      <h3>1. Intentional Asynchronous Architecture</h3>
+      <p class="qs">Questions 1, 3, 9, 13, 14</p>
+      <p>Distributed teams operate best when information flows transparently without requiring everyone to be online at the same moment. This relies on structural adjustments such as decoupling dependencies, keeping a meticulous single source of truth (centralized wikis), and writing self-explanatory, context-rich documentation so teammates can proceed unhindered.</p>
+    </article>
+    <article class="pillar p2">
+      <h3>2. Conscious Communication Protocols</h3>
+      <p class="qs">Questions 2, 6, 7, 10, 11</p>
+      <p>Text interactions lack tone, gesture, and expression, creating a high probability for communication breakdowns. Excellence in this pillar means maintaining deliberate escalation paths (knowing when to pivot from text to video), building a framework for relational baseline trust to prevent negative bias, and creating explicit channel guidelines.</p>
+    </article>
+    <article class="pillar p3">
+      <h3>3. Equitable Inclusion &amp; Risk Management</h3>
+      <p class="qs">Questions 4, 5, 8, 12, 15</p>
+      <p>Remote environments organically conceal challenges like isolation, uneven participation, and shifting schedules. Strong virtual operators actively redistribute structural burdens fairly (such as time-zone scheduling rotations), amplify marginalized peer contributions in collaborative meetings, and proactively track accountability milestones visually.</p>
+    </article>
+  </section>
+
+  <footer>
+    <p>How Good Are Your Virtual Team Skills? &mdash; Self-Assessment. &copy; Inspired by Mind Tools Assessment Framework.</p>
+    <p>Pedagogical design and adaptation by Dr. Teague. HTML and JavaScript generated with Claude, an interactive resource from Anthropic, then reviewed and published by Dr. Teague.</p>
+    <p>Anthropic. (2026). <em>Claude Sonnet 5.5</em> [Large language model]. <a href="https://claude.ai" rel="noopener">https://claude.ai</a></p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var statements = [
+    "I establish clear guidelines with my team regarding expected response windows for communication channels.",
+    "I actively assume positive intent when reading short, direct, or unpunctuated text messages from teammates.",
+    "I document my project updates in a centralized location so others don't have to wait for me to log on to see progress.",
+    "I look for ways to rotate or share the burden of inconvenient meeting hours across different global regions.",
+    "I step in to reference, rescue, or amplify quiet team members' ideas when they get overlooked in text chats or live calls.",
+    "I separate my professional notifications from my personal focus windows to avoid remote work burnout.",
+    "I rely heavily on visual cues or short video huddles when resolving highly complex or emotionally sensitive text disputes.",
+    "I strictly track my tasks inside project tools (e.g., boards, planners) rather than letting status live entirely in chat logs.",
+    "I create predictable, explicit outlines of my milestones so peers can work independently without micro-dependencies.",
+    "I prioritize building relational baseline trust (such as casual text channels or brief social check-ins) with digital peers.",
+    "I immediately transition to voice or video when a text chain undergoes more than three loops of clarification.",
+    "I maintain a strict boundaries framework between my asynchronous solo tasks and real-time interactive commitments.",
+    "I ensure that all group decisions reached in ad-hoc or private calls are immediately summarized publicly for the wider team.",
+    "I design my shared file systems with consistent naming conventions so teammates can locate items without asking me.",
+    "I proactively flag potential project delays ahead of time, ensuring my remote peers can adjust their timelines seamlessly."
+  ];
+  var options = [
+    { code: "SA", label: "Strongly Agree", pts: 5 },
+    { code: "A",  label: "Agree", pts: 4 },
+    { code: "N",  label: "Neither", pts: 3 },
+    { code: "D",  label: "Disagree", pts: 2 },
+    { code: "SD", label: "Strongly Disagree", pts: 1 }
+  ];
+  var pillars = [
+    { name: "Intentional Asynchronous Architecture", qs: [1, 3, 9, 13, 14] },
+    { name: "Conscious Communication Protocols",      qs: [2, 6, 7, 10, 11] },
+    { name: "Equitable Inclusion & Risk Management",  qs: [4, 5, 8, 12, 15] }
+  ];
+  var bands = [
+    { name: "Emerging Virtual Collaborator", text: "You likely experience significant friction in digital environments. Focus on building asynchronous habits, clarifying boundaries, and explicitly establishing project trackers." },
+    { name: "Competent Virtual Teammate", text: "Your virtual skills are solid, but there is noticeable room for optimization. Target your lower-scoring statements to improve." },
+    { name: "Highly Effective Digital Leader", text: "Excellent work! Focus on sustaining these habits and mentoring peers." }
+  ];
+
+  var form = document.getElementById("quiz");
+  var msg = document.getElementById("msg");
+  var result = document.getElementById("result");
+
+  statements.forEach(function (text, i) {
+    var n = i + 1;
+    var fs = document.createElement("fieldset");
+    fs.className = "q";
+    var html = '<legend>Statement ' + n + ' of 15</legend><p class="stmt">' + text.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</p><div class="opts">';
+    options.forEach(function (o) {
+      html += '<label><input type="radio" name="q' + n + '" value="' + o.pts + '" aria-label="' + o.label + '"><span>' + o.code + '<small>' + o.label + '</small></span></label>';
+    });
+    html += "</div>";
+    fs.innerHTML = html;
+    form.appendChild(fs);
+  });
+
+  function answers() {
+    var a = [];
+    for (var n = 1; n <= 15; n++) {
+      var c = form.querySelector('input[name="q' + n + '"]:checked');
+      a.push(c ? parseInt(c.value, 10) : null);
+    }
+    return a;
+  }
+
+  function updateProgress() {
+    var done = answers().filter(function (v) { return v !== null; }).length;
+    document.getElementById("count").textContent = done + " of 15 answered";
+    document.getElementById("fill").style.width = (done / 15 * 100) + "%";
+  }
+  form.addEventListener("change", function () { msg.textContent = ""; updateProgress(); });
+
+  document.getElementById("score").addEventListener("click", function () {
+    var a = answers();
+    var first = a.indexOf(null);
+    if (first !== -1) {
+      var missing = a.filter(function (v) { return v === null; }).length;
+      msg.textContent = missing + " statement" + (missing === 1 ? "" : "s") + " still unanswered. Answer all 15 to see your score.";
+      var el = form.querySelector('input[name="q' + (first + 1) + '"]');
+      el.closest("fieldset").scrollIntoView({ block: "center" });
+      el.focus({ preventScroll: true });
+      return;
+    }
+    var total = a.reduce(function (s, v) { return s + v; }, 0);
+    var b = total <= 35 ? 0 : total <= 55 ? 1 : 2;
+
+    document.getElementById("total").innerHTML = total + ' <small>out of 75</small>';
+    document.getElementById("level").textContent = bands[b].name;
+    document.getElementById("levelText").textContent = bands[b].text;
+
+    var scores = pillars.map(function (p) {
+      return p.qs.reduce(function (s, q) { return s + a[q - 1]; }, 0);
+    });
+    document.getElementById("pillarscores").innerHTML = pillars.map(function (p, i) {
+      return '<div class="ps"><span>' + (i + 1) + '. ' + p.name.replace(/&/g, "&amp;") + '</span><strong>' + scores[i] + ' / 25</strong>' +
+             '<div class="track"><i style="width:' + (scores[i] / 25 * 100) + '%"></i></div></div>';
+    }).join("");
+
+    var low = a.map(function (v, i) { return { v: v, n: i + 1 }; }).filter(function (x) { return x.v <= 3; }).map(function (x) { return x.n; });
+    document.getElementById("lowest").textContent = low.length
+      ? "Statements to target first (scored Neither or lower): " + low.join(", ") + "."
+      : "Every statement scored Agree or higher. Keep sustaining these habits.";
+
+    Array.prototype.forEach.call(document.querySelectorAll("#bands tr[data-band]"), function (tr) {
+      tr.classList.toggle("active", parseInt(tr.getAttribute("data-band"), 10) === b);
+    });
+    result.classList.add("show");
+    result.scrollIntoView({ block: "start" });
+    result.focus({ preventScroll: true });
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    form.reset();
+    result.classList.remove("show");
+    Array.prototype.forEach.call(document.querySelectorAll("#bands tr"), function (tr) { tr.classList.remove("active"); });
+    msg.textContent = "";
+    updateProgress();
+    window.scrollTo({ top: 0 });
+  });
+})();
+</script>
+</body>
+</html>
