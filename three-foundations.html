@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Three Foundations Explorer</title>
+<!--
+  Three Foundations Explorer: Tyler, Schwab, Tomlinson
+  Pedagogical design, framing, and content: Dr. Teague (The Politics of Curriculum).
+  HTML/CSS/JavaScript generated with assistance from Claude (Anthropic, 2026).
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: header, then a two-column explorer (diagram | detail panel) that stacks on phones. */
+:root {
+  --bg: #F3F5F8;
+  --surface: #FFFFFF;
+  --ink: #1B2433;
+  --muted: #4D5868;
+  --line: #9AA6B8;
+  --hub: #1B2433;
+  --hub-ink: #FFFFFF;
+  --hub-sub: #C9D3E2;
+  --tyler: #1E6B73;
+  --schwab: #5A4A8C;
+  --tomlinson: #8C5A0E;
+  --milieu: #4D5868;
+  --tint-tyler: #E3F0F1;
+  --tint-schwab: #ECE8F5;
+  --tint-tomlinson: #F6EDDF;
+  --tint-milieu: #E7EBF1;
+  --display: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --body: 'Public Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121722; --surface: #1B2230; --ink: #E7ECF4; --muted: #A9B4C5; --line: #5B6880;
+    --hub: #E7ECF4; --hub-ink: #121722; --hub-sub: #3E4A5E;
+    --tyler: #6FC2CA; --schwab: #B3A6E3; --tomlinson: #E2B26A; --milieu: #A9B4C5;
+    --tint-tyler: #183238; --tint-schwab: #26213A; --tint-tomlinson: #33281A; --tint-milieu: #232B3A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121722; --surface: #1B2230; --ink: #E7ECF4; --muted: #A9B4C5; --line: #5B6880;
+  --hub: #E7ECF4; --hub-ink: #121722; --hub-sub: #3E4A5E;
+  --tyler: #6FC2CA; --schwab: #B3A6E3; --tomlinson: #E2B26A; --milieu: #A9B4C5;
+  --tint-tyler: #183238; --tint-schwab: #26213A; --tint-tomlinson: #33281A; --tint-milieu: #232B3A;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 16px; line-height: 1.6;
+}
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-block: 40px 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 28px;
+}
+header { display: flex; flex-direction: column; gap: 8px; max-width: 68ch; }
+.kicker { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(32px, 5vw, 46px); line-height: 1.12; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); font-size: 18px; }
+.explorer { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 860px) { .explorer { grid-template-columns: minmax(0, 1fr); } }
+
+/* Diagram */
+.diagram { width: 100%; max-width: 600px; margin: 0 auto; }
+.diagram svg { width: 100%; height: auto; display: block; overflow: visible; }
+.hint { text-align: center; color: var(--muted); font-size: 14px; margin: 8px 0 0; }
+.node { cursor: pointer; outline: none; }
+.node .box { fill: var(--surface); stroke-width: 2.5; transition: fill .2s ease; }
+.node .eyebrow { font-family: var(--body); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; }
+.node .word { font-family: var(--display); font-size: 34px; font-weight: 600; fill: var(--ink); }
+.node[data-key="tyler"] .box { stroke: var(--tyler); } .node[data-key="tyler"] .eyebrow { fill: var(--tyler); }
+.node[data-key="schwab"] .box { stroke: var(--schwab); } .node[data-key="schwab"] .eyebrow { fill: var(--schwab); }
+.node[data-key="tomlinson"] .box { stroke: var(--tomlinson); } .node[data-key="tomlinson"] .eyebrow { fill: var(--tomlinson); }
+.node[data-key="milieu"] .box { stroke: var(--milieu); stroke-dasharray: 5 4; } .node[data-key="milieu"] .eyebrow { fill: var(--milieu); }
+.node[data-key="tyler"]:hover .box, .node[data-key="tyler"].is-active .box { fill: var(--tint-tyler); }
+.node[data-key="schwab"]:hover .box, .node[data-key="schwab"].is-active .box { fill: var(--tint-schwab); }
+.node[data-key="tomlinson"]:hover .box, .node[data-key="tomlinson"].is-active .box { fill: var(--tint-tomlinson); }
+.node[data-key="milieu"]:hover .box, .node[data-key="milieu"].is-active .box { fill: var(--tint-milieu); }
+.node.is-active .box { stroke-width: 4; }
+.node:focus-visible .box, .node:focus-visible .hubdisc { stroke: var(--ink); stroke-width: 4; stroke-dasharray: none; }
+.hubdisc { fill: var(--hub); stroke: var(--hub); stroke-width: 0; }
+.node[data-key="learner"].is-active .hubdisc { stroke: var(--line); stroke-width: 6; }
+.hub-eyebrow { font-family: var(--body); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; fill: var(--hub-sub); }
+.hub-text { font-family: var(--display); font-size: 21px; font-weight: 500; fill: var(--hub-ink); }
+.ring { fill: none; stroke: var(--line); stroke-width: 2; stroke-dasharray: 8 7; }
+.prong { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Panel */
+.panels { min-width: 0; }
+.panel {
+  background: var(--surface); border-radius: 18px; border: 2px solid var(--accent, var(--line));
+  padding: 28px; display: flex; flex-direction: column; gap: 18px; min-width: 0;
+}
+.panel .p-eyebrow { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent, var(--muted)); }
+.panel h2 { font-family: var(--display); font-weight: 600; font-size: 30px; line-height: 1.2; margin: 0; text-wrap: balance; }
+.panel .question { font-family: var(--display); font-size: 21px; line-height: 1.4; margin: 0; font-style: italic; }
+.panel p { margin: 0; max-width: 65ch; }
+.panel h3 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.block { display: flex; flex-direction: column; gap: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.chips li { font-size: 14px; padding: 4px 12px; border-radius: 999px; background: var(--tint, var(--tint-milieu)); color: var(--ink); }
+.example { background: var(--tint, var(--tint-milieu)); border-radius: 12px; padding: 14px 16px; }
+.reflect { border-top: 1px solid var(--line); padding-top: 16px; }
+.ref { font-size: 14px; color: var(--muted); padding-left: 2em; text-indent: -2em; }
+.ref em { font-style: italic; }
+.nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.nav button {
+  font: inherit; font-size: 14px; font-weight: 600; min-height: 44px; padding: 8px 16px; border-radius: 999px;
+  border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer;
+}
+.nav button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.nav button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+footer { border-top: 1px solid var(--line); padding-top: 18px; color: var(--muted); font-size: 13px; display: flex; flex-direction: column; gap: 6px; max-width: 90ch; }
+footer p { margin: 0; }
+footer .credit { color: var(--ink); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<style>body{margin:0}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <p class="kicker">The Politics of Curriculum</p>
+    <h1>Three Foundations</h1>
+    <p class="lede">Purpose, balance, and response, with the learner at the center. Select any part of the diagram to explore it.</p>
+  </header>
+
+  <div class="explorer">
+    <div class="diagram">
+      <svg viewBox="0 0 600 600" role="group" aria-label="Diagram: Tyler, Schwab, and Tomlinson meet at the learner, inside the milieu">
+        <circle class="ring" cx="300" cy="310" r="270"></circle>
+        <path class="prong" style="stroke: var(--tyler)" d="M 300 143 L 300 238"></path>
+        <path class="prong" style="stroke: var(--schwab)" d="M 228 310 L 120 310 L 120 452"></path>
+        <path class="prong" style="stroke: var(--tomlinson)" d="M 372 310 L 480 310 L 480 452"></path>
+
+        <g class="node" data-key="tyler" tabindex="0" role="button" aria-label="Tyler: Purpose. Why?">
+          <rect class="box" x="190" y="47" width="220" height="96" rx="14"></rect>
+          <text class="eyebrow" x="300" y="80" text-anchor="middle">TYLER · PURPOSE</text>
+          <text class="word" x="300" y="122" text-anchor="middle">Why?</text>
+        </g>
+        <g class="node" data-key="schwab" tabindex="0" role="button" aria-label="Schwab: Balance. Who?">
+          <rect class="box" x="10" y="452" width="220" height="96" rx="14"></rect>
+          <text class="eyebrow" x="120" y="485" text-anchor="middle">SCHWAB · BALANCE</text>
+          <text class="word" x="120" y="527" text-anchor="middle">Who?</text>
+        </g>
+        <g class="node" data-key="tomlinson" tabindex="0" role="button" aria-label="Tomlinson: Response. How?">
+          <rect class="box" x="370" y="452" width="220" height="96" rx="14"></rect>
+          <text class="eyebrow" x="480" y="485" text-anchor="middle">TOMLINSON · RESPONSE</text>
+          <text class="word" x="480" y="527" text-anchor="middle">How?</text>
+        </g>
+        <g class="node" data-key="milieu" tabindex="0" role="button" aria-label="The milieu: policy, law, and community values">
+          <rect class="box" x="246" y="540" width="108" height="32" rx="16"></rect>
+          <text class="eyebrow" x="300" y="561" text-anchor="middle">MILIEU</text>
+        </g>
+        <g class="node" data-key="learner" tabindex="0" role="button" aria-label="The learner: What serves this student?">
+          <circle class="hubdisc" cx="300" cy="310" r="72"></circle>
+          <text class="hub-eyebrow" x="300" y="284" text-anchor="middle">THE LEARNER</text>
+          <text class="hub-text" x="300" y="314" text-anchor="middle">What serves</text>
+          <text class="hub-text" x="300" y="340" text-anchor="middle">this student?</text>
+        </g>
+      </svg>
+      <p class="hint">Tap or click a prong, the center, or the milieu.</p>
+    </div>
+
+    <div class="panels" aria-live="polite">
+<section class="panel" id="panel-learner" data-key="learner" style="--accent: var(--ink); --tint: var(--tint-milieu)">
+  <p class="p-eyebrow">The center</p>
+  <h2>The Learner</h2>
+  <p class="question">What serves this student?</p>
+  <p>Each foundation answers a different question, and all three point to the same place. Tyler asks why, Schwab asks who, and Tomlinson asks how. When the learner sits at the center, the politics of curriculum become a shared judgment about students rather than a contest over who prevails.</p>
+  <div class="block"><ul class="chips"><li>Why? Purpose</li><li>Who? Balance</li><li>How? Response</li></ul></div>
+  <div class="block"><h3>In practice</h3><p class="example">A curriculum decision can be tested against all three at once: Does it serve a clear purpose? Were the right voices at the table? Can teachers adapt it for the students in front of them?</p></div>
+  <div class="block reflect"><h3>Reflect</h3><p>Look at a recent curriculum decision in your setting. Which of the three questions did it answer well, and which did it skip?</p></div>
+</section>
+<section class="panel" id="panel-tyler" data-key="tyler" style="--accent: var(--tyler); --tint: var(--tint-tyler)" hidden>
+  <p class="p-eyebrow">Ralph Tyler · Purpose</p>
+  <h2>Why?</h2>
+  <p class="question">What educational purposes should the school seek to attain?</p>
+  <p>Tyler organized curriculum work around four questions, and purposes came first. Learning experiences, organization, and evaluation all follow from them. He did not leave purposes to any single authority. Planners draw on three sources and then filter the results through two screens.</p>
+  <div class="block"><h3>Three sources, two screens</h3><ul class="chips"><li>Studies of learners</li><li>Studies of contemporary life</li><li>Subject specialists</li><li>Screen: philosophy of education</li><li>Screen: psychology of learning</li></ul></div>
+  <div class="block"><h3>In practice</h3><p class="example">Before choosing activities for a unit, a team agrees on the purpose: students will be able to evaluate primary sources. Every later choice, from readings to the final assessment, is checked against that purpose.</p></div>
+  <div class="block reflect"><h3>Reflect</h3><p>Which purpose does this curriculum decision serve, and what evidence from learners, contemporary life, and specialists supports it?</p></div>
+  <div class="block"><h3>Reference</h3><p class="ref">Tyler, R. W. (1949). <em>Basic principles of curriculum and instruction</em>. University of Chicago Press.</p></div>
+</section>
+<section class="panel" id="panel-schwab" data-key="schwab" style="--accent: var(--schwab); --tint: var(--tint-schwab)" hidden>
+  <p class="p-eyebrow">Joseph Schwab · Balance</p>
+  <h2>Who?</h2>
+  <p class="question">Whose perspectives must shape this decision?</p>
+  <p>Schwab argued that sound curriculum decisions give balanced attention to four commonplaces, and that no single one should dominate. Curriculum making is deliberation: people who represent each commonplace weigh alternatives together and reach defensible choices for particular students in a particular setting.</p>
+  <div class="block"><h3>The four commonplaces</h3><ul class="chips"><li>Learner</li><li>Teacher</li><li>Subject matter</li><li>Milieu</li></ul></div>
+  <div class="block"><h3>In practice</h3><p class="example">The teacher is one of the commonplaces, so teacher capacity and well-being belong in the balance. A mandate that expands what teachers must adapt, without attention to their time, preparation, and own needs, is out of balance by Schwab’s standard.</p></div>
+  <div class="block reflect"><h3>Reflect</h3><p>Which commonplace is missing or underweighted in the conversation about this decision?</p></div>
+  <div class="block"><h3>Reference</h3><p class="ref">Schwab, J. J. (1973). The practical 3: Translation into curriculum. <em>The School Review, 81</em>(4), 501–522.</p></div>
+</section>
+<section class="panel" id="panel-tomlinson" data-key="tomlinson" style="--accent: var(--tomlinson); --tint: var(--tint-tomlinson)" hidden>
+  <p class="p-eyebrow">Carol Ann Tomlinson · Response</p>
+  <h2>How?</h2>
+  <p class="question">What does this student need from me today?</p>
+  <p>Differentiation is a teacher’s responsive, intentional planning grounded in knowing students well. Teachers can adjust content, process, product, and learning environment in response to readiness, interest, and learning profile. Tomlinson describes readiness as a student’s current proximity to specific learning goals, so it moves as circumstances change.</p>
+  <div class="block"><h3>What a teacher can adjust</h3><ul class="chips"><li>Content</li><li>Process</li><li>Product</li><li>Learning environment</li></ul></div>
+  <div class="block"><h3>In practice</h3><p class="example">Differentiation does not wait for a diagnosis. After a family move or a loss, a student’s readiness may dip for a few weeks. The teacher adjusts the process and offers more choice, without requiring a label as the price of support.</p></div>
+  <div class="block reflect"><h3>Reflect</h3><p>What temporary, unidentified challenges might your students be carrying, and how would your plan respond to them?</p></div>
+  <div class="block"><h3>Reference</h3><p class="ref">Tomlinson, C. A. (2014). <em>The differentiated classroom: Responding to the needs of all learners</em> (2nd ed.). ASCD.</p></div>
+</section>
+<section class="panel" id="panel-milieu" data-key="milieu" style="--accent: var(--milieu); --tint: var(--tint-milieu)" hidden>
+  <p class="p-eyebrow">The surrounding ring</p>
+  <h2>The Milieu</h2>
+  <p class="question">What surrounds the work without being its core?</p>
+  <p>Policy, law, and community values shape every curriculum decision. The least restrictive environment (LRE) shows how. It began as a civil liberties principle, the least restrictive alternative, before it became an education requirement. LRE is a legal entitlement for students eligible under IDEA. Differentiation is a professional obligation to every student, with or without a label.</p>
+  <div class="block"><h3>How LRE developed</h3><ul class="chips"><li>Shelton v. Tucker (1960)</li><li>PARC v. Pennsylvania (1971–72)</li><li>Mills v. Board of Education (1972)</li><li>Section 504 (1973)</li><li>P.L. 94-142 (1975)</li><li>IDEA (1990)</li></ul></div>
+  <div class="block"><h3>In practice</h3><p class="example">Because LRE began as a legal principle rather than a pedagogical one, differentiation was later asked to carry legal weight it was never designed to bear. Recognizing that history helps explain much of the friction around implementation.</p></div>
+  <div class="block reflect"><h3>Reflect</h3><p>Which forces in your milieu are shaping this decision, and are they serving the learner at the center?</p></div>
+</section>
+</div>
+  </div>
+
+  <div class="nav" role="group" aria-label="Choose a section">
+    <button type="button" data-key="learner" id="nav-learner">The Learner</button>
+    <button type="button" data-key="tyler" id="nav-tyler">Tyler</button>
+    <button type="button" data-key="schwab" id="nav-schwab">Schwab</button>
+    <button type="button" data-key="tomlinson" id="nav-tomlinson">Tomlinson</button>
+    <button type="button" data-key="milieu" id="nav-milieu">The Milieu</button>
+  </div>
+
+  <footer>
+    <p class="credit">Dr. Teague · The Politics of Curriculum</p>
+    <p>Pedagogical design, framing, and instructional content by Dr. Teague. The HTML, CSS, and JavaScript for this interactive were generated with the assistance of Claude, a large language model, under her direction.</p>
+    <p class="ref">Anthropic. (2026). <em>Claude Opus 5.5</em> [Large language model]. https://claude.ai</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.node');
+  var navs = document.querySelectorAll('.nav button');
+  var panels = document.querySelectorAll('.panels .panel');
+  function show(key) {
+    var i;
+    for (i = 0; i < panels.length; i++) { panels[i].hidden = panels[i].getAttribute('data-key') !== key; }
+    for (i = 0; i < nodes.length; i++) {
+      var on = nodes[i].getAttribute('data-key') === key;
+      nodes[i].classList.toggle('is-active', on);
+      nodes[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    for (i = 0; i < navs.length; i++) { navs[i].setAttribute('aria-pressed', navs[i].getAttribute('data-key') === key ? 'true' : 'false'); }
+  }
+  function bind(el) {
+    el.addEventListener('click', function () { show(el.getAttribute('data-key')); });
+  }
+  var i;
+  for (i = 0; i < nodes.length; i++) {
+    bind(nodes[i]);
+    nodes[i].addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); show(this.getAttribute('data-key')); }
+    });
+  }
+  for (i = 0; i < navs.length; i++) { bind(navs[i]); }
+  show('learner');
+})();
+</script>
+
+</body>
+</html>
